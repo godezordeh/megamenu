@@ -200,6 +200,30 @@ app.post('/webhook', (req, res) => {
   console.log('Webhook recebido:', JSON.stringify(event, null, 2));
   res.status(200).send('ok');
 });
+// ======================================================
+// ROTA DO WEBHOOK DA CWAY
+// ======================================================
+app.post("/webhook/pix", (req, res) => {
+  const tokenHeader = req.headers["x-cway-token"] || req.body?.token;
+
+  if (
+    process.env.WEBHOOK_TOKEN_VALIDATION &&
+    tokenHeader !== process.env.WEBHOOK_TOKEN_VALIDATION
+  ) {
+    console.log("[WEBHOOK] Token inválido:", tokenHeader);
+    return res.status(401).json({ error: "invalid token" });
+  }
+
+  console.log("[WEBHOOK] Payload recebido:", JSON.stringify(req.body, null, 2));
+  return res.status(200).json({ ok: true });
+});
+
+// ======================================================
+// ROTA BASE / HEALTHCHECK
+// ======================================================
+app.get("/", (req, res) => {
+  res.send("✅ Cway backend is running!");
+});
 
 app.listen(PORT, () => {
   console.log(`Cway backend on http://localhost:${PORT}`);
